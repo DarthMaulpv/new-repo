@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>signature</title>
+    <style>
+        .main{
+            position: absolute;
+            top: 50%;
+            left: 50%;  
+            transform: translate(-50%,-50%);
+
+        }
+        .canvas{
+            border: 2px solid black;
+        }
+        .top,.bottom{
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0px 20px 0px;
+        }
+        .block, input , select , button{
+            width: 80%;
+        
+        }
+        .bottom>button{
+            margin: 10px;
+        }
+        .top>.block{
+            margin:5px;
+        }
+        .block>p{
+            margin:10px auto;
+            width: 50%;
+        }
+    </style>
+    <link rel="icon" href="favicon-16x16.png">
+    <link rel="stylesheet" href="path/to/bootstrap.min.css">
+
+
+
+  </head>
+<body>
+    <div class="main">
+        <div class="top">
+            <div class="block">
+
+                <p> Text color picker</p>
+                <input class="color" type="color" id="Colorpicker"/>
+            </div>
+            <div class="block">
+                <p> background color</p>
+                <input class="color" type="color" id="canavacolor"/>
+            </div>
+            <div class="block">
+                <p> Text Size </p>
+                <select id="fontpicker">
+                    <option value="5">5px</option>
+                    <option value="10">10px</option>
+                    <option value="20">20px</option>
+                    <option value="30">30px</option>
+                    <option value="40">40px</option>
+
+
+
+
+                </select>
+            </div>
+        </div>
+        <canvas class="canvas" id="mycanva" width="800" height="500"></canvas>
+        <div class="bottom">
+            <button type="button" class="btn btn-danger" id="clearBtton">Clear</button>
+            <button type="button" class="btn btn-success" id="saveBtton">Save & Download</button>
+            <button type="button" class="btn btn-warning" id="retriveBtton">retrive the signature</button>
+
+
+            
+            
+            
+        </div>
+        <script>
+            const Colorpicker = document.getElementById("Colorpicker");
+            const canvascolor = document.getElementById("canavacolor");
+            const canvas = document.getElementById("mycanva");
+            const clearBtton = document.getElementById("clearBtton");
+            const saveBtton = document.getElementById("saveBtton");
+            const retriveBtton = document.getElementById("retriveBtton");
+            const fontpicker = document.getElementById("fontpicker");
+            const ctx = canvas.getContext("2d");
+        
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+        
+            Colorpicker.addEventListener('change', (e) => {
+                ctx.strokeStyle = e.target.value;
+                ctx.fillStyle = e.target.value;
+            });
+        
+            canvascolor.addEventListener('change', (e) => {
+                canvas.style.backgroundColor = e.target.value;
+            });
+        
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                lastX = e.offsetX;
+                lastY = e.offsetY;
+            });
+        
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDrawing) {
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                    lastX = e.offsetX;
+                    lastY = e.offsetY;
+                }
+            });
+        
+            canvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+            });
+        
+            canvas.addEventListener('mouseout', () => {
+                isDrawing = false;
+            });
+        
+            clearBtton.addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+        
+            saveBtton.addEventListener('click', () => {
+                localStorage.setItem('savedSignature', canvas.toDataURL());
+                let link = document.createElement('a');
+                link.download = 'signature.png';
+                link .href = canvas.toDataURL();
+                link.click();
+                
+            });
+        
+            retriveBtton.addEventListener('click', () => {
+                let savedSignature = localStorage.getItem('savedSignature');
+                if(savedSignature){
+                    let img = new Image();
+                    img.src = savedSignature;
+                        ctx.drawImage(img, 0, 0);
+                    }
+                
+                // Add your retrieve logic here
+            });
+            canavacolor.addEventListener('change', (e) => {
+                ctx.fillStyle = e.target.value;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            });
+            fontpicker.addEventListener('change', (e) => {
+                ctx.lineWidth = e.target.value;
+            });
+
+        </script>
+        </body>
+        </html>
